@@ -30,7 +30,11 @@ import junit.textui.TestRunner;
 public class AllTests {
     
     public static void main(String[] args) {
-        TestRunner.run(AllTests.suite());
+        junit.framework.TestResult result = TestRunner.run(AllTests.suite());
+        // SEAL: fail the forked JVM (and the Ant build) when any test fails
+        if (!result.wasSuccessful()) {
+            System.exit(1);
+        }
     }
     
     public static Test suite() {

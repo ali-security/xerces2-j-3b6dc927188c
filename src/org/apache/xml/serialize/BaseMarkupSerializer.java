@@ -1847,4 +1847,20 @@ public abstract class BaseMarkupSerializer
 	 protected void checkUnboundNamespacePrefixedNode (Node node) throws IOException{
 	 	
 	 }
+
+    //
+    // SEAL: explicit abstract declarations of the interface methods this abstract
+    // class does not implement. javac 1.3 (which built the published 2.12.0 jar)
+    // emitted these "Miranda" methods automatically; javac 5+ does not. Declaring
+    // them keeps the public API of the class file identical. No behaviour change.
+    //
+
+    public abstract void endElement(String tagName) throws SAXException;
+
+    public abstract void endElement(String namespaceURI, String localName, String rawName) throws SAXException;
+
+    public abstract void startElement(String namespaceURI, String localName, String rawName, org.xml.sax.Attributes attrs) throws SAXException;
+
+    public abstract void startElement(String tagName, org.xml.sax.AttributeList attrs) throws SAXException;
+
 }

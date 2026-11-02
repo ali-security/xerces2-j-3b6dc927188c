@@ -1,0 +1,72 @@
+# Seal build: Xerces-J has no GitHub Actions CI upstream. This workflow runs the
+# project's own Ant build (build.sh + bundled tools/ant 1.7.1) for the `jar`
+# target and its own `test` target (sanity programs + JUnit AllTests suites).
+name: seal-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      test-filter:
+        description: "Space/comma-separated test main classes to run instead of the full `test` target (e.g. schema.config.AllTests)"
+        required: false
+        default: ""
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      # tools/bin/xjavac.jar only prepends xml-apis to the bootclasspath for
+      # Sun/Oracle/IBM VMs; Zulu reports "Azul", so JDK 8's rt.jar DOM HTML
+      # interfaces would win and the compile fails. Prepend it for every JVM.
+      JAVA_TOOL_OPTIONS: -Xbootclasspath/p:${{ github.workspace }}/tools/xml-apis.jar
+    steps:
+      - uses: actions/checkout@v4
+
+      # The release was built with Sun JDK 1.3.1 (classes major 47). JDK 8 is the
+      # newest javac that still accepts -source/-target 1.3 and the newest JVM
+      # supporting -Xbootclasspath/p, which build.xml's test target relies on.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: "8"
+
+      - name: Build xercesImpl.jar
+        run: sh build.sh -Djavac.source=1.3 -Djavac.target=1.3 jar
+
+      - name: Test (full project test target)
+        if: ${{ inputs.test-filter == '' }}
+        run: |
+          set -o pipefail
+          sh build.sh -Djavac.source=1.3 -Djavac.target=1.3 test 2>&1 | tee test.log
+          if grep -E 'Assertion failed|FAILURES!!!' test.log; then
+            echo "Test failures detected"
+            exit 1
+          fi
+
+      - name: Test (selected tests)
+        if: ${{ inputs.test-filter != '' }}
+        run: |
+          set -o pipefail
+          sh build.sh -Djavac.source=1.3 -Djavac.target=1.3 tests
+          T=tools
+          BCP="$T/xml-apis.jar:$T/resolver.jar:$T/serializer.jar:$T/junit.jar:build/classes:build/tests"
+          for cls in $(echo "${{ inputs.test-filter }}" | tr ',' ' '); do
+            echo "Running $cls ..."
+            java -Xbootclasspath/p:$BCP $cls 2>&1 | tee -a test.log
+          done
+          if grep -E 'Assertion failed|FAILURES!!!' test.log; then
+            echo "Test failures detected"
+            exit 1
+          fi
+
+      - name: Stage release artifact
+        run: |
+          mkdir -p dist
+          cp build/xercesImpl.jar dist/xercesImpl-2.12.0.jar
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xercesImpl-2.12.0
+          path: dist/xercesImpl-2.12.0.jar
+          if-no-files-found: error

@@ -475,4 +475,47 @@ public abstract class DTDParser
     public void endContentModel() throws XNIException {
     } // endContentModel
 
+    //
+    // SEAL: explicit abstract declarations of the interface methods this abstract
+    // class does not implement. javac 1.3 (which built the published 2.12.0 jar)
+    // emitted these "Miranda" methods automatically; javac 5+ does not. Declaring
+    // them keeps the public API of the class file identical. No behaviour change.
+    //
+
+    public abstract void any(Augmentations augs) throws XNIException;
+
+    public abstract void element(String elementName, Augmentations augs) throws XNIException;
+
+    public abstract void empty(Augmentations augs) throws XNIException;
+
+    public abstract void endContentModel(Augmentations augs) throws XNIException;
+
+    public abstract void endGroup(Augmentations augs) throws XNIException;
+
+    public abstract void endParameterEntity(String name, Augmentations augs) throws XNIException;
+
+    public abstract org.apache.xerces.xni.parser.XMLDTDContentModelSource getDTDContentModelSource();
+
+    public abstract org.apache.xerces.xni.parser.XMLDTDSource getDTDSource();
+
+    public abstract void ignoredCharacters(XMLString text, Augmentations augs) throws XNIException;
+
+    public abstract void occurrence(short occurrence, Augmentations augs) throws XNIException;
+
+    public abstract void pcdata(Augmentations augs) throws XNIException;
+
+    public abstract void separator(short separator, Augmentations augs) throws XNIException;
+
+    public abstract void setDTDContentModelSource(org.apache.xerces.xni.parser.XMLDTDContentModelSource source);
+
+    public abstract void setDTDSource(org.apache.xerces.xni.parser.XMLDTDSource source);
+
+    public abstract void startContentModel(String elementName, Augmentations augs) throws XNIException;
+
+    public abstract void startGroup(Augmentations augs) throws XNIException;
+
+    public abstract void startParameterEntity(String name, XMLResourceIdentifier identifier, String encoding, Augmentations augs) throws XNIException;
+
+    public abstract void textDecl(String version, String encoding, Augmentations augs) throws XNIException;
+
 } // class DTDParser

@@ -1507,4 +1507,19 @@ public abstract class XMLScanner
         fResourceIdentifier.clear();
     } 
 
+    //
+    // SEAL: explicit abstract declarations of the interface methods this abstract
+    // class does not implement. javac 1.3 (which built the published 2.12.0 jar)
+    // emitted these "Miranda" methods automatically; javac 5+ does not. Declaring
+    // them keeps the public API of the class file identical. No behaviour change.
+    //
+
+    public abstract Boolean getFeatureDefault(String featureId);
+
+    public abstract Object getPropertyDefault(String propertyId);
+
+    public abstract String[] getRecognizedFeatures();
+
+    public abstract String[] getRecognizedProperties();
+
 } // class XMLScanner

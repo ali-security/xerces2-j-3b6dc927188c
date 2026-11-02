@@ -664,7 +664,7 @@ public class Test implements DOMErrorHandler, LSResourceResolver {
 				(DOMImplementationLS) DOMImplementationRegistry.newInstance().getDOMImplementation(
 					"LS");
 			LSInput source = impl.createLSInput();
-			if (systemId.equals("personal.xsd")) {
+			if (systemId.endsWith("personal.xsd")) {
 				source.setSystemId("data/personal.xsd");
 			}
 			else {

@@ -29,7 +29,11 @@ import junit.framework.TestSuite;
 public class AllTests {
 
     public static void main(String[] args) {
-        junit.textui.TestRunner.run(AllTests.suite());
+        junit.framework.TestResult result = junit.textui.TestRunner.run(AllTests.suite());
+        // SEAL: fail the forked JVM (and the Ant build) when any test fails
+        if (!result.wasSuccessful()) {
+            System.exit(1);
+        }
     }
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for Schema Annotations");
